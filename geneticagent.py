@@ -48,7 +48,8 @@ class GeneticAgent:
     # determine velocity 
     # move 
     #collision check? do in main loop()
-    def move(self, delta_time):
+    def move(self, delta_time) -> tuple:
+        old_position = self.position
         self.iteration_delta_time += delta_time
         if self.iteration_delta_time > self.turn_rate:
             self.curr_iteration = min(self.curr_iteration + 1, self.sequence_length - 2)
@@ -59,3 +60,6 @@ class GeneticAgent:
         self.curr_direction = np.array([x_dir,y_dir])
         velocity = self.curr_direction * self.speed
         self.position += velocity * delta_time
+        self.path.append(self.position)
+        return (old_position, self.position)
+
