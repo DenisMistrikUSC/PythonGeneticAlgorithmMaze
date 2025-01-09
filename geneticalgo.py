@@ -28,7 +28,7 @@ class GeneticAlgoParameters:
     COLLISION_PENALTY : float = 0.1
 
 class GeneticSimulator:
-    def __init__(self, parameters : GeneticAlgoParameters, canvas : tk.Canvas):
+    def __init__(self, parameters : GeneticAlgoParameters, canvas : tk.Canvas, master : tk.Tk):
         self.params = parameters
         self.canvas = canvas
         self.population : list[ag.GeneticAgent] = [] # storage of the current population of agents
@@ -36,6 +36,7 @@ class GeneticSimulator:
         self.generation_count = 0
         self.is_running = False
         self.agents_finished = 0
+        self.master = master
 
 def collision_check(self, agent : ag.GeneticAgent) -> None:
     
@@ -43,7 +44,7 @@ def collision_check(self, agent : ag.GeneticAgent) -> None:
     #check maze bounds collision
     has_collided = not np.all((self.params.MAZE_BOUNDS[0] <= agent.position) & (agent.position <= self.params.MAZE_BOUNDS[1]))
     #check obstacle collision
-     #principles off AABB collision
+    #principles of AABB collision
     if not has_collided:
         for obstacle in self.params.OBSTACLES:
             top_left, bottom_right = obstacle
@@ -56,7 +57,11 @@ def collision_check(self, agent : ag.GeneticAgent) -> None:
         agent.final_position = agent.position
         self.agents_finished += 1
         self.end_history.append(agent.position)
-    
+
+def goal_check(self) -> None:
+    for agent in self.population:
+        if np.all((self.params.GOAL_POSITION <= agent.position)):
+            self.is_running = False
 
 def crossover(self, parent1, parent2) -> ag.GeneticAgent:
     child = ag.GeneticAgent()
@@ -68,10 +73,41 @@ def crossover(self, parent1, parent2) -> ag.GeneticAgent:
     return child
 
 def run_generation(self) -> None:
+    if not self.is_running:
+            return
+    self.canvas.delete("agent_path")
     self.agents_finished = 0
     #the game loop
+    game_loop()
+    #generate new generation label
+    self.generation_count += 1
+    
+    #get the fittest and save them
+    cutoff_index = int(len(self.population) * self.params.CUTOFF)
+    bottom_agents = self.population[cutoff_index:]
+    self.population = self.population[:cutoff_index]
+
+    #reproduce
+    needed = self.params.NUM_AGENTS - len(self.population) - self.params.STRAGGLER_COUNT
+    new_population = []
+    while len(new_population) < needed:
+        p1, p2 = random.sample(self.population, 2)
+        child = crossover(p1, p2)
+        child.mutate(self.mutation_rate)
+        new_population.append(child)
+    self.population.extend(new_population)
+    #save however many stragglers
+    stragglers = random.sample(bottom_agents, self.params.STRAGGLER_COUNT)
+    self.population.extend(stragglers)
+    #conclude the generation, check if goal was reached and start the next
+    if not self.is_running:
+            return
+    self.master.after(300, run_generation())
+
+def game_loop(self) -> None:
     prev_time = time.time()
     while(self.agents_finished < self.params.NUM_AGENTS):
+        self.canvas.delete("agent")
         curr_time = time.time()
         delta_time = curr_time - prev_time
         prev_time = curr_time
@@ -79,9 +115,22 @@ def run_generation(self) -> None:
             if not agent.has_collided:
                 prev_pos, curr_pos = agent.move(delta_time)
                 collision_check(agent)
-                #draw the line
-    #conclude the generation and start calculating fitness, then do crossovers and mutations
 
+                #draw the line
+                self.canvas.create_line(prev_pos[0], prev_pos[1], curr_pos[0], curr_pos[1], fill="gray", width=1, tags="agent_path")
+                #draw the agent
+                r = 3
+                self.canvas.create_oval(
+                    agent.position[0] - r, agent.position[1] - r, agent.position[0] + r, agent.position[1] + r,
+                    fill="blue", tags="agent"
+                )
+    self.population.sort(
+            key=lambda a: a.get_fitness(self.params.COLLISION_PENALTY, self.GOAL_POSITION), 
+            reverse=True
+        )
 
 def start_simulation(self) -> None:
-    pass
+    self.population = [ag.GeneticAgent() for _ in range(self.params.NUM_AGENTS)]
+    self.generation = 0
+    self.running = True
+    self.run_generation()
