@@ -21,27 +21,30 @@ class GeneticAgent:
         self.genes = np.random.uniform(-1.0, 1.0, (sequence_length, 2))
         self.speed = speed
         self.path = [] #total path taken per frame,
-        self.final_position = 0 #this is either where it collides
+        self.final_position = np.array([0,0]) #this is either where it collides
         self.curr_iteration = 0 #index of the genetic direction currently being used
         self.position = np.array([start[0], start[1]])
+        self.start_position = np.array([start[0], start[1]])
         self.curr_direction = self.genes[0]
         self.turn_rate = turn_rate
         self.iteration_delta_time = 0 #the amount of time that has passed since the current iteration started
         self.has_collided = False #stop moving agents that hit a wall already
 
-    def mutate(self,rate):
+    def mutate(self,rate) -> None:
         for i in range(self.sequence_length):
             if random.uniform(0.0,1.0) < rate:
                 self.genes[i] = (random.uniform(-1.0,1.0),random.uniform(-1.0,1.0))
     
-    def get_fitness(self, collision_penalty, goal):
+    def get_fitness(self, goal) -> float:
         dx = goal[0] - self.position[0]
         dy = goal[1] - self.position[1]
         fitness = 1 / (dx ** 2 + dy ** 2 + 1)
-        if self.has_collided:
-            fitness -= collision_penalty
         return fitness
     
+    def copy(self) -> object:
+        clone = GeneticAgent(self.sequence_length, self.speed, self.start_position, self.turn_rate)
+        clone.genes = self.genes[:]
+        return clone
 
     #check if delta_time puts it over turn rate, if so increase iteration by 1,
     # determine the turn rate by lerping the current iteration with the succeeding one (edge case on last one to not go over size)
@@ -49,7 +52,7 @@ class GeneticAgent:
     # move 
     #collision check? do in main loop()
     def move(self, delta_time) -> tuple:
-        old_position = self.position
+        old_position = self.position.copy()
         self.iteration_delta_time += delta_time
         if self.iteration_delta_time > self.turn_rate:
             self.curr_iteration = min(self.curr_iteration + 1, self.sequence_length - 2)
@@ -61,5 +64,6 @@ class GeneticAgent:
         velocity = self.curr_direction * self.speed
         self.position += velocity * delta_time
         self.path.append(self.position)
+       #
         return (old_position, self.position)
 
