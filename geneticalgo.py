@@ -24,10 +24,11 @@ class GeneticAlgoParameters:
     STRAGGLER_COUNT : int = 0
     START_POSITION : np.ndarray = field(default_factory=lambda:np.array([25.0,25.0]))
     GOAL_POSITION : np.ndarray = field(default_factory=lambda:np.array([400.0,400.0]))
-    OBSTACLES: list[tuple] = field(default_factory=lambda:[]) #list because this can change with user input later down the line will be a list of tuples
+    OBSTACLES: list = field(default_factory=lambda:[]) 
+    #list because this can change with user input later down the line.
 
 class GeneticSimulator:
-    def __init__(self, parameters : GeneticAlgoParameters, canvas : tk.Canvas, master : tk.Tk):
+    def __init__(self, parameters : GeneticAlgoParameters, canvas : tk.Canvas, master : tk.Tk, label_update : callable):
         self.params = parameters
         self.canvas = canvas
         self.population : list[ag.GeneticAgent] = [] # storage of the current population of agents
@@ -36,6 +37,7 @@ class GeneticSimulator:
         self.is_running = False
         self.agents_finished = 0
         self.master = master
+        self.label_update = label_update
         
 
     def collision_check(self, agent : ag.GeneticAgent) -> None:
@@ -46,7 +48,8 @@ class GeneticSimulator:
         #principles of AABB collision
         if not has_collided:
             for obstacle in self.params.OBSTACLES:
-                top_left, bottom_right = obstacle
+                top_left = obstacle[0]
+                bottom_right = obstacle[1]
                 if np.all((top_left <= agent.position) & (agent.position <= bottom_right)):
                     has_collided = True
                     break
@@ -56,10 +59,22 @@ class GeneticSimulator:
             agent.final_position = agent.position
             self.agents_finished += 1
             self.end_history.append(agent.position)
+            r = 3
+            self.canvas.create_oval(
+                        agent.position[0] - r, agent.position[1] - r, agent.position[0] + r, agent.position[1] + r,
+                        fill="cyan", tags="end_agent"
+                    )
 
     def goal_check(self,agent) -> None:
         if np.all((self.params.GOAL_POSITION <= agent.position)):
             self.is_running = False
+            r = 5
+            self.canvas.create_oval(
+                        agent.position[0] - r, agent.position[1] - r, agent.position[0] + r, agent.position[1] + r,
+                        fill="green", tags="end_agent"
+                    )
+            #draw the path of the successful agent
+            
             
 
     def crossover(self, parent1, parent2) -> ag.GeneticAgent:
@@ -75,12 +90,15 @@ class GeneticSimulator:
         if not self.is_running:
                 return
         self.canvas.delete("agent_path")
+        self.canvas.delete("end_agent")
         self.agents_finished = 0
+        self.generation_count += 1
+        self.label_update(self.generation_count)
         #the game loop
         self.game_loop()
         #generate new generation label
-        self.generation_count += 1
-        print(self.generation_count)
+        if not self.is_running:
+                return
         #get the fittest and save them
         cutoff_index = int(len(self.population) * self.params.CUTOFF)
         bottom_agents = self.population[cutoff_index:]
@@ -98,9 +116,7 @@ class GeneticSimulator:
         #save however many stragglers
         self.population.extend(straggler.copy() for straggler in random.sample(bottom_agents, self.params.STRAGGLER_COUNT))
         #conclude the generation, check if goal was reached and start the next
-        print(self.population)
-        if not self.is_running:
-                return
+        
         self.master.after(30, self.run_generation())
 
     def game_loop(self) -> None:
@@ -124,7 +140,7 @@ class GeneticSimulator:
                         fill="blue", tags="agent"
                     )
                     self.canvas.update()
-            time.sleep(0.1)
+            time.sleep(0.05)
         self.population.sort(
                 key=lambda a: a.get_fitness(self.params.GOAL_POSITION), 
                 reverse=True

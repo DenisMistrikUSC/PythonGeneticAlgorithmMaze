@@ -6,13 +6,10 @@ import geneticalgo as ga
 
 MAZE_WIDTH = 500.0
 MAZE_HEIGHT = 500.0
-GOAL = np.array([350.0, 350.0])
+GOAL = np.array([450.0, 450.0])
 START = np.array([50.0, 50.0])
 WALLS = [
-    (100, 100, 300, 100),
-    (100, 100, 100, 300),
-    (300, 100, 300, 300),
-    (100, 300, 300, 300),
+    np.array([np.array([100.0,100.0]), np.array([300.0,300.0])])
 ]
 
 MAX_GENES = 200         
@@ -69,11 +66,13 @@ class GeneticGUI:
                         START[0] - 4, START[1] - 4, START[0] + 4, START[1] + 4,
                         fill="blue", tags="start"
                     )
-        self.canvas.create_oval(
-                        GOAL[0] - 4, GOAL[1] - 4, GOAL[0] + 4, GOAL[1] + 4,
-                        fill="RED", tags="GOAL"
-                    )
+        self.canvas.create_rectangle(GOAL[0], GOAL[1], MAZE_WIDTH, MAZE_HEIGHT, fill="red", tags="goal")
+        self.draw_obstacles()
 
+    def draw_obstacles(self):
+        for obstacle in WALLS:
+            print(obstacle)
+            self.canvas.create_rectangle(obstacle[0][0], obstacle[0][1], obstacle[1][0], obstacle[1][1], fill="gray", tags="maze")
     def start_button(self):
         self.window.after(0,self.start_sim)
     def start_sim(self):
@@ -81,7 +80,7 @@ class GeneticGUI:
         parameters = ga.GeneticAlgoParameters(
             GENETIC_SEQUENCE_LENGTH=int(self.sequence_length_entry.get()),
             AGENT_SPEED=float(self.speed_entry.get()),
-            MAZE_BOUNDS=np.array([[0, 0],[MAZE_WIDTH,MAZE_HEIGHT]]),
+            MAZE_BOUNDS=np.array([[1.0, 1.0],[MAZE_WIDTH,MAZE_HEIGHT]]),
             TURN_RATE=float(self.turn_rate_entry.get()),
             MUTATION_RATE=np.clip(float(self.mutation_entry.get()), 0.0, 1.0),
             CUTOFF=np.clip(float(self.cutoff_entry.get()), 0.0, 1.0),
@@ -89,13 +88,12 @@ class GeneticGUI:
             STRAGGLER_COUNT=np.clip(int(self.straggler_entry.get()), 0, int(int(self.pop_entry.get()) * (1 - float(self.cutoff_entry.get())))),
             START_POSITION=START,
             GOAL_POSITION=GOAL,
+            OBSTACLES=WALLS
         )
-        simulation = ga.GeneticSimulator(parameters=parameters,canvas=self.canvas, master=window)      
+        simulation = ga.GeneticSimulator(parameters=parameters,canvas=self.canvas, master=window, label_update=self.update_label)      
         simulation.start_simulation()
     def update_label(self, gen_count):
         self.gen_label.config(text=f"Generation: {gen_count}")
-    def draw_obstacles():
-        pass
 
 
 
