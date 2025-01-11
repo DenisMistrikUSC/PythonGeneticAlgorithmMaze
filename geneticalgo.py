@@ -69,11 +69,15 @@ class GeneticSimulator:
         if np.all((self.params.GOAL_POSITION <= agent.position)):
             self.is_running = False
             r = 5
+            #draw the path of the successful agent
+            for i in range(len(agent.path)):
+                self.canvas.create_line(agent.path[i][0], agent.path[i][1], agent.path[i+1][0], agent.path[i+1][1], fill="red", width=3, tags="winner_agent_path")
+            self.canvas.tag_raise("winner_agent_path")
             self.canvas.create_oval(
                         agent.position[0] - r, agent.position[1] - r, agent.position[0] + r, agent.position[1] + r,
                         fill="green", tags="end_agent"
                     )
-            #draw the path of the successful agent
+            self.canvas.tag_raise("end_agent")
             
             
 
@@ -108,13 +112,20 @@ class GeneticSimulator:
         needed = self.params.NUM_AGENTS - len(self.population) - self.params.STRAGGLER_COUNT
         new_population = []
         while len(new_population) < needed:
-            p1, p2 = random.sample(self.population, 2)
+            if len(self.population) < 2:
+                p1 = self.population[0]
+                p2 = self.population[0]
+            else:
+                p1, p2 = random.sample(self.population, 2)
             child = self.crossover(p1, p2)
             child.mutate(self.params.MUTATION_RATE)
             new_population.append(child)
         self.population.extend(new_population)
         #save however many stragglers
-        self.population.extend(straggler.copy() for straggler in random.sample(bottom_agents, self.params.STRAGGLER_COUNT))
+        stragglers = [straggler.copy() for straggler in random.sample(bottom_agents, self.params.STRAGGLER_COUNT)]
+        for straggler in stragglers:
+            straggler.mutate(self.params.MUTATION_RATE)
+        self.population.extend(stragglers)
         #conclude the generation, check if goal was reached and start the next
         
         self.master.after(30, self.run_generation())

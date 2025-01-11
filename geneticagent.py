@@ -63,7 +63,7 @@ class GeneticAgent:
         self.curr_direction = np.array([x_dir,y_dir])
         velocity = self.curr_direction * self.speed
         self.position += velocity * delta_time
-        self.path.append(self.position)
+        self.path.append(self.position.copy())
        #
         return (old_position, self.position)
 

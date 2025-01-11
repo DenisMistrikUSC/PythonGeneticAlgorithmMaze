@@ -71,7 +71,6 @@ class GeneticGUI:
 
     def draw_obstacles(self):
         for obstacle in WALLS:
-            print(obstacle)
             self.canvas.create_rectangle(obstacle[0][0], obstacle[0][1], obstacle[1][0], obstacle[1][1], fill="gray", tags="maze")
     def start_button(self):
         self.window.after(0,self.start_sim)
