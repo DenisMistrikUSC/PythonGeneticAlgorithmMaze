@@ -27,7 +27,7 @@ class GeneticGUI:
         row += 1
         tk.Label(window, text="Cutoff:").grid(row=row, column=0, sticky="e")
         self.cutoff_entry = tk.Entry(window)
-        self.cutoff_entry.insert(0, "0.3")
+        self.cutoff_entry.insert(0, "0.2")
         self.cutoff_entry.grid(row=row, column=1)
         row += 1
         tk.Label(window, text="Mutation Rate:").grid(row=row, column=0, sticky="e")
@@ -47,12 +47,12 @@ class GeneticGUI:
         row += 1
         tk.Label(window, text="Turn Rate:").grid(row=row, column=0, sticky="e")
         self.turn_rate_entry = tk.Entry(window)
-        self.turn_rate_entry.insert(0, "0.5")
+        self.turn_rate_entry.insert(0, "0.7")
         self.turn_rate_entry.grid(row=row, column=1)
         row += 1
         tk.Label(window, text="Genetic Sequence Length:").grid(row=row, column=0, sticky="e")
         self.sequence_length_entry = tk.Entry(window)
-        self.sequence_length_entry.insert(0, "100")
+        self.sequence_length_entry.insert(0, "40")
         self.sequence_length_entry.grid(row=row, column=1)
         row += 1
         tk.Button(window, text="Start", command=self.start_button).grid(row=row, column=0, columnspan=2)

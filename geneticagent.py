@@ -29,6 +29,9 @@ class GeneticAgent:
         self.turn_rate = turn_rate
         self.iteration_delta_time = 0 #the amount of time that has passed since the current iteration started
         self.has_collided = False #stop moving agents that hit a wall already
+        self.generation = 1 #current generation it is running in
+        self.inception_generation = 1 #generation where this agent was created 
+        self.fitness = 0
 
     def mutate(self,rate) -> None:
         for i in range(self.sequence_length):
@@ -39,20 +42,24 @@ class GeneticAgent:
         dx = goal[0] - self.position[0]
         dy = goal[1] - self.position[1]
         fitness = 1 / (dx ** 2 + dy ** 2 + 1)
+        self.fitness = fitness
         return fitness
     
-    def copy(self) -> object:
+    def copy(self, generation) -> object:
         clone = GeneticAgent(self.sequence_length, self.speed, self.start_position, self.turn_rate)
         clone.genes = self.genes[:]
+        clone.generation = generation
         return clone
     
-    def crossover(self, parent1, parent2) -> object:
+    def crossover(self, parent1, parent2, generation) -> object:
         child = GeneticAgent(self.sequence_length, self.speed, self.start_position, self.turn_rate)
         for i in range(self.sequence_length):
             if random.random() < 0.5:
                 child.genes[i] = parent1.genes[i]
             else:
                 child.genes[i] = parent2.genes[i]
+        child.inception_generation = generation
+        child.generation = generation
         return child
     #check if delta_time puts it over turn rate, if so increase iteration by 1,
     # determine the turn rate by lerping the current iteration with the succeeding one (edge case on last one to not go over size)

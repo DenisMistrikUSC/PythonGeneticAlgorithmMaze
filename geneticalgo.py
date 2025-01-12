@@ -9,6 +9,7 @@ import numpy as np
 import random
 import tkinter as tk
 import time
+import datanalysis
 from dataclasses import dataclass, field
 
 @dataclass
@@ -33,11 +34,12 @@ class GeneticSimulator:
         self.canvas = canvas
         self.population : list[ag.GeneticAgent] = [] # storage of the current population of agents
         self.end_history = [] #list of every single past agents final position, i.e where it collided 
-        self.generation_count = 0
+        self.generation_count = 1
         self.is_running = False
         self.agents_finished = 0
         self.master = master
         self.label_update = label_update
+        self.all_agents = [] # a list of all agents ever
         
 
     def collision_check(self, agent : ag.GeneticAgent) -> None:
@@ -70,7 +72,7 @@ class GeneticSimulator:
             self.is_running = False 
             r = 5
             #draw the path of the successful agent
-            for i in range(len(agent.path)):
+            for i in range(len(agent.path)-1):
                 self.canvas.create_line(agent.path[i][0], agent.path[i][1], agent.path[i+1][0], agent.path[i+1][1], fill="red", width=3, tags="winner_agent_path")
             self.canvas.tag_raise("winner_agent_path")
             self.canvas.create_oval(
@@ -78,6 +80,8 @@ class GeneticSimulator:
                         fill="green", tags="end_agent"
                     )
             self.canvas.tag_raise("end_agent")
+            data = datanalysis.DataAnalyzer(self.all_agents)
+            data.show_fitness_graph()
             
 
     def run_generation(self) -> None:
@@ -90,6 +94,7 @@ class GeneticSimulator:
         self.label_update(self.generation_count)
         #the game loop
         self.game_loop()
+        self.all_agents.extend(self.population.copy())
         #generate new generation label
         if not self.is_running:
                 return
@@ -97,7 +102,7 @@ class GeneticSimulator:
         cutoff_index = int(len(self.population) * self.params.CUTOFF)
         bottom_agents = self.population[cutoff_index:]
         population_remaining = self.population[:cutoff_index]
-        self.population = [agent.copy() for agent in population_remaining]
+        self.population = [agent.copy(self.generation_count+1) for agent in population_remaining]
         #reproduce
         needed = self.params.NUM_AGENTS - len(self.population) - self.params.STRAGGLER_COUNT
         new_population = []
@@ -107,12 +112,12 @@ class GeneticSimulator:
                 p2 = self.population[0]
             else:
                 p1, p2 = random.sample(self.population, 2)
-            child = p1.crossover(p1, p2)
+            child = p1.crossover(p1, p2, self.generation_count+1)
             child.mutate(self.params.MUTATION_RATE)
             new_population.append(child)
         self.population.extend(new_population)
         #save however many stragglers
-        stragglers = [straggler.copy() for straggler in random.sample(bottom_agents, self.params.STRAGGLER_COUNT)]
+        stragglers = [straggler.copy(self.generation_count+1) for straggler in random.sample(bottom_agents, self.params.STRAGGLER_COUNT)]
         for straggler in stragglers:
             straggler.mutate(self.params.MUTATION_RATE)
         self.population.extend(stragglers)
@@ -141,7 +146,7 @@ class GeneticSimulator:
                         fill="blue", tags="agent"
                     )
                     self.canvas.update()
-            time.sleep(0.05)
+            #time.sleep(0.05)
         self.population.sort(
                 key=lambda a: a.get_fitness(self.params.GOAL_POSITION), 
                 reverse=True
@@ -150,6 +155,6 @@ class GeneticSimulator:
 
     def start_simulation(self) -> None:
         self.population = [ag.GeneticAgent(self.params.GENETIC_SEQUENCE_LENGTH, self.params.AGENT_SPEED, self.params.START_POSITION, self.params.TURN_RATE) for _ in range(self.params.NUM_AGENTS)]
-        self.generation = 0
+        self.generation_count = 0
         self.is_running = True
         self.run_generation()
