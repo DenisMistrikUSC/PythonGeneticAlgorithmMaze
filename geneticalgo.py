@@ -67,7 +67,7 @@ class GeneticSimulator:
 
     def goal_check(self,agent) -> None:
         if np.all((self.params.GOAL_POSITION <= agent.position)):
-            self.is_running = False
+            self.is_running = False 
             r = 5
             #draw the path of the successful agent
             for i in range(len(agent.path)):
@@ -79,16 +79,6 @@ class GeneticSimulator:
                     )
             self.canvas.tag_raise("end_agent")
             
-            
-
-    def crossover(self, parent1, parent2) -> ag.GeneticAgent:
-        child = ag.GeneticAgent(self.params.GENETIC_SEQUENCE_LENGTH, self.params.AGENT_SPEED, self.params.START_POSITION, self.params.TURN_RATE)
-        for i in range(self.params.GENETIC_SEQUENCE_LENGTH):
-            if random.random() < 0.5:
-                child.genes[i] = parent1.genes[i]
-            else:
-                child.genes[i] = parent2.genes[i]
-        return child
 
     def run_generation(self) -> None:
         if not self.is_running:
@@ -117,7 +107,7 @@ class GeneticSimulator:
                 p2 = self.population[0]
             else:
                 p1, p2 = random.sample(self.population, 2)
-            child = self.crossover(p1, p2)
+            child = p1.crossover(p1, p2)
             child.mutate(self.params.MUTATION_RATE)
             new_population.append(child)
         self.population.extend(new_population)

@@ -45,7 +45,15 @@ class GeneticAgent:
         clone = GeneticAgent(self.sequence_length, self.speed, self.start_position, self.turn_rate)
         clone.genes = self.genes[:]
         return clone
-
+    
+    def crossover(self, parent1, parent2) -> object:
+        child = GeneticAgent(self.sequence_length, self.speed, self.start_position, self.turn_rate)
+        for i in range(self.sequence_length):
+            if random.random() < 0.5:
+                child.genes[i] = parent1.genes[i]
+            else:
+                child.genes[i] = parent2.genes[i]
+        return child
     #check if delta_time puts it over turn rate, if so increase iteration by 1,
     # determine the turn rate by lerping the current iteration with the succeeding one (edge case on last one to not go over size)
     # determine velocity 
