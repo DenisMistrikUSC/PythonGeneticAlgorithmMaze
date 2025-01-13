@@ -10,9 +10,32 @@ class DataAnalyzer:
 
     def format_data():
         pass
-    #show a heatmap like graph of where the final positions of each agent are
-    def show_bottleneck_graph():
-        pass
+    #show a 2d histogram like graph of where the final positions of each agent are
+    def show_bottleneck_graph(self, height, width, bins):
+        final_positions = np.array([agent.final_position for agent in self.agent_list])
+        x_coords = final_positions[:, 0]
+        y_coords = final_positions[:, 1]
+        if len(x_coords) != len(y_coords):
+            raise ValueError('x and y must have the same length.')
+
+        heatmap, xedges, yedges = np.histogram2d(
+            x_coords, y_coords,
+            bins=bins,
+            range=[[0, width], [0, height]]
+        )
+        plt.imshow(
+        heatmap, 
+        cmap='plasma',
+        origin='upper',
+        extent=[0, width, 0, height]
+        )
+        plt.colorbar(label='Frequency')
+        plt.title('Frequency Heatmap of 2D Positions')
+        plt.xlabel('X Position')
+        plt.ylabel('Y Position')
+        plt.show()
+
+
 
     #heatmap of all paths taken
     def show_heatmap():

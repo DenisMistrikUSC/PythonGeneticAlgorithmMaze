@@ -58,7 +58,7 @@ class GeneticSimulator:
         
         if has_collided:
             agent.has_collided = True
-            agent.final_position = agent.position
+            agent.final_position = np.minimum(np.maximum(agent.position, self.params.MAZE_BOUNDS[0]), self.params.MAZE_BOUNDS[1])
             self.agents_finished += 1
             self.end_history.append(agent.position)
             r = 3
@@ -81,7 +81,7 @@ class GeneticSimulator:
                     )
             self.canvas.tag_raise("end_agent")
             data = datanalysis.DataAnalyzer(self.all_agents)
-            data.show_fitness_graph()
+            data.show_bottleneck_graph(self.params.MAZE_BOUNDS[1][1], self.params.MAZE_BOUNDS[1][0],10)
             
 
     def run_generation(self) -> None:
