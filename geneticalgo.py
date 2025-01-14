@@ -81,7 +81,7 @@ class GeneticSimulator:
                     )
             self.canvas.tag_raise("end_agent")
             data = datanalysis.DataAnalyzer(self.all_agents)
-            data.show_bottleneck_graph(self.params.MAZE_BOUNDS[1][1], self.params.MAZE_BOUNDS[1][0],10)
+            data.show_bottleneck_graph(self.params.MAZE_BOUNDS[1][1], self.params.MAZE_BOUNDS[1][0],15)
             
 
     def run_generation(self) -> None:

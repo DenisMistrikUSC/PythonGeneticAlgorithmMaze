@@ -24,11 +24,12 @@ class DataAnalyzer:
             range=[[0, width], [0, height]]
         )
         plt.imshow(
-        heatmap, 
+        heatmap.T, 
         cmap='plasma',
-        origin='upper',
+        origin='lower',
         extent=[0, width, 0, height]
         )
+        plt.gca().invert_yaxis()
         plt.colorbar(label='Frequency')
         plt.title('Frequency Heatmap of 2D Positions')
         plt.xlabel('X Position')
