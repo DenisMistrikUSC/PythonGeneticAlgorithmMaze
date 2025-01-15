@@ -3,13 +3,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import geneticagent as ga
+from scipy.stats import gaussian_kde
 
 class DataAnalyzer:
     def __init__(self, agent_list):
         self.agent_list : list [ga.GeneticAgent] = agent_list
 
-    def format_data():
-        pass
     #show a 2d histogram like graph of where the final positions of each agent are
     def show_bottleneck_graph(self, height, width, bins):
         final_positions = np.array([agent.final_position for agent in self.agent_list])
@@ -38,9 +37,28 @@ class DataAnalyzer:
 
 
 
-    #heatmap of all paths taken
-    def show_heatmap():
-        pass
+    #heatmap of all paths taken using kde
+    def show_heatmap(self):
+        all_paths = [agent.path for agent in self.agent_list]
+        flattened_positions = np.array([pos for subarray in all_paths for pos in subarray])
+        x_coords = flattened_positions[:, 0]
+        y_coords = flattened_positions[:, 1]
+        xy = np.vstack([x_coords, y_coords])
+        kde = gaussian_kde(xy)
+        x_min, x_max = x_coords.min(), x_coords.max()
+        y_min, y_max = y_coords.min(), y_coords.max()
+        x_grid, y_grid = np.linspace(x_min, x_max, 100), np.linspace(y_min, y_max, 100)
+        X, Y = np.meshgrid(x_grid, y_grid)
+        Z = kde(np.vstack([X.ravel(), Y.ravel()])).reshape(X.shape)
+        plt.contourf(X, Y, Z, levels=50, cmap='viridis', origin='upper')
+        plt.gca().invert_yaxis() 
+        plt.colorbar(label='Density')
+        plt.title("Heatmap of all paths taken")
+        plt.xlabel("X")
+        plt.ylabel("Y")
+        plt.show()
+
+
 
     #simple line graph of the average fitness per generation
     def show_fitness_graph(self):
