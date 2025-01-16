@@ -1,7 +1,17 @@
 # PythonGeneticAlgorithmMaze
  A visualized maze solver using genetic algorithms of various complexity, uses game engine logic to give each agent velocities. This project aims to give an intuitive rundown of what genetic algorithms are, what they can achieve, what their setbacks are, and how they slowly build to the more advanced methods of artificial intelligence that we see today.
 
-Naive Genetic Algorithm Approach:
+# Usage Instructions
+
+Run geneticgui.py, this will display a window where you can adjust the parameters and press start to run the simulation.
+
+After the simulation completes a popup tab will appear with 3 graphing options:
+
+    - **Path Heatmap:** This shows a smooth heatmap of all of the paths taken across all generations, this will show which areas were more trafficked, uses Kernel Density Estimation for a smooth heatmap
+    - **End position heatmap:** This histogram shows which part of the maze had the most collisions across generations, helpful for visualizing bottlenecks
+    - **Average generational fitness:** This is a basic line graph that maps the average fitness across generations
+
+# Naive Genetic Algorithm Approach:
 
 You can run this version by selecting the "naive direction genetic agent" option
 
@@ -21,3 +31,4 @@ Local maxima become a big issue: Just as in gradient descent, there is a signifi
 
 While it is possible to adjust the parameters of the algorithm, by increasing the amount of surviving stragglers, increasing the mutation rate, and loosening the cutoff threshold, this again can cause issues with even more extreme complex mazes and require a rapidly increasing amount of generations to solve. 
 
+# TODO: Advanced algorithm
