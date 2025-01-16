@@ -29,7 +29,7 @@ class GeneticAlgoParameters:
     #list because this can change with user input later down the line.
 
 class GeneticSimulator:
-    def __init__(self, parameters : GeneticAlgoParameters, canvas : tk.Canvas, master : tk.Tk, label_update : callable):
+    def __init__(self, parameters : GeneticAlgoParameters, canvas : tk.Canvas, master : tk.Tk, label_update : callable, popup : callable):
         self.params = parameters
         self.canvas = canvas
         self.population : list[ag.GeneticAgent] = [] # storage of the current population of agents
@@ -40,6 +40,7 @@ class GeneticSimulator:
         self.master = master
         self.label_update = label_update
         self.all_agents = [] # a list of all agents ever
+        self.popup = popup
         
 
     def collision_check(self, agent : ag.GeneticAgent) -> None:
@@ -80,9 +81,7 @@ class GeneticSimulator:
                         fill="green", tags="end_agent"
                     )
             self.canvas.tag_raise("end_agent")
-            data = datanalysis.DataAnalyzer(self.all_agents)
-            #data.show_bottleneck_graph(self.params.MAZE_BOUNDS[1][1], self.params.MAZE_BOUNDS[1][0],15)
-            data.show_heatmap()
+            self.master.after(0,self.popup())
 
     def run_generation(self) -> None:
         if not self.is_running:

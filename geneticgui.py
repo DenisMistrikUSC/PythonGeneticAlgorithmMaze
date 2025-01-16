@@ -1,6 +1,7 @@
 import tkinter as tk
 import numpy as np
 import geneticalgo as ga
+import datanalysis
 #define the ttinker gui for inputs into genetic algo
 #setting to draw the best path in a current generation to display red 
 
@@ -89,11 +90,21 @@ class GeneticGUI:
             GOAL_POSITION=GOAL,
             OBSTACLES=WALLS
         )
-        simulation = ga.GeneticSimulator(parameters=parameters,canvas=self.canvas, master=window, label_update=self.update_label)      
-        simulation.start_simulation()
+        self.simulation = ga.GeneticSimulator(parameters=parameters,canvas=self.canvas, master=window, label_update=self.update_label, popup=self.open_graph_popup)      
+        self.simulation.start_simulation()
     def update_label(self, gen_count):
         self.gen_label.config(text=f"Generation: {gen_count}")
-
+    def open_graph_popup(self):
+        popup = tk.Toplevel(self.window)
+        data = datanalysis.DataAnalyzer(self.simulation.all_agents)
+        popup.geometry ("350x250")
+        popup.title("Data Analysis")
+        tk.Button(popup, text="Show Generational Fitness", command=data.show_fitness_graph).grid(row=0, column=3, columnspan=2, sticky='ew')
+        tk.Button(popup, text="Show Path Heatmap", command=data.show_heatmap).grid(row=2, column=3, columnspan=2, sticky='ew')
+        tk.Button(popup, text="Show End Position Heatmap", command=lambda: data.show_bottleneck_graph(MAZE_HEIGHT, MAZE_WIDTH, 25)
+        ).grid(row=4, column=3, columnspan=2, sticky='ew')
+        for child in popup.winfo_children():
+            child.grid_configure(padx=35, pady=25)
 
 
 window = tk.Tk()

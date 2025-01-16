@@ -76,6 +76,7 @@ class DataAnalyzer:
             generation_agent_count += 1
             generation_total_fitness += agent.fitness
         df = pd.concat([df, pd.DataFrame({"Generation": [curr_generation], "Average Fitness": [generation_total_fitness / generation_agent_count]})], ignore_index=True)
+        plt.title("Average fitness across generations")
         plt.plot(df["Generation"], df["Average Fitness"]) 
         plt.show() 
 
