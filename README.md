@@ -7,15 +7,11 @@ Run geneticgui.py, this will display a window where you can adjust the parameter
 
 After the simulation completes a popup tab will appear with 3 graphing options:
 
-    - **Path Heatmap:** This shows a smooth heatmap of all of the paths taken across all generations, this will show which areas were more trafficked, uses Kernel Density Estimation for a smooth heatmap
-    - **End position heatmap:** This histogram shows which part of the maze had the most collisions across generations, helpful for visualizing bottlenecks
-    - **Average generational fitness:** This is a basic line graph that maps the average fitness across generations
+    - This shows a smooth heatmap of all of the paths taken across all generations, this will show which areas were more trafficked, uses Kernel Density Estimation for a smooth heatmap
+    - This histogram shows which part of the maze had the most collisions across generations, helpful for visualizing bottlenecks
+    - This is a basic line graph that maps the average fitness across generations
 
 # Naive Genetic Algorithm Approach:
-
-You can run this version by selecting the "naive direction genetic agent" option
-
-The first genetic agent defined uses the most basic genetic algorithm approach:
 
 Their genetic sequence is comprised of a list of 2d vector directions, with the agent constantly moving forward and turning between them at a given rate.
 
