@@ -91,7 +91,7 @@ class GeneticGUI:
             OBSTACLES=WALLS
         )
         self.simulation = ga.GeneticSimulator(parameters=parameters,canvas=self.canvas, master=window, label_update=self.update_label, popup=self.open_graph_popup)      
-        self.simulation.start_simulation()
+        self.simulation.start_simulation("naive")
     def update_label(self, gen_count):
         self.gen_label.config(text=f"Generation: {gen_count}")
     def open_graph_popup(self):

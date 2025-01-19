@@ -4,14 +4,14 @@
 #number of agents 
 #population cutoff
 #number of stragglers (say for genetic diversity you maintain a random "straggler" agent that would not have met the cutoff)
-import geneticagent as ag
 import numpy as np
 import random
 import tkinter as tk
 import time
 import datanalysis
 from dataclasses import dataclass, field
-
+from agent_factory import AgentFactory
+from geneticagent_virtual import GeneticAgent
 @dataclass
 class GeneticAlgoParameters:
     GENETIC_SEQUENCE_LENGTH : int = 200
@@ -32,7 +32,7 @@ class GeneticSimulator:
     def __init__(self, parameters : GeneticAlgoParameters, canvas : tk.Canvas, master : tk.Tk, label_update : callable, popup : callable):
         self.params = parameters
         self.canvas = canvas
-        self.population : list[ag.GeneticAgent] = [] # storage of the current population of agents
+        self.population : list[GeneticAgent] = [] # storage of the current population of agents
         self.end_history = [] #list of every single past agents final position, i.e where it collided 
         self.generation_count = 1
         self.is_running = False
@@ -41,9 +41,10 @@ class GeneticSimulator:
         self.label_update = label_update
         self.all_agents = [] # a list of all agents ever
         self.popup = popup
+        self.factory = AgentFactory()
         
 
-    def collision_check(self, agent : ag.GeneticAgent) -> None:
+    def collision_check(self, agent : GeneticAgent) -> None:
         #check for collisions, if any found then set has_collided and final position 
         #check maze bounds collision
         has_collided = not np.all((self.params.MAZE_BOUNDS[0] < agent.position) & (agent.position < self.params.MAZE_BOUNDS[1]))
@@ -152,8 +153,20 @@ class GeneticSimulator:
             )
         
 
-    def start_simulation(self) -> None:
-        self.population = [ag.GeneticAgent(self.params.GENETIC_SEQUENCE_LENGTH, self.params.AGENT_SPEED, self.params.START_POSITION, self.params.TURN_RATE) for _ in range(self.params.NUM_AGENTS)]
+    def start_simulation(self, agent_type) -> None:
+        self.population = [
+            self.factory.create_agent(
+                agent_type,
+                self.params.GENETIC_SEQUENCE_LENGTH,
+                self.params.AGENT_SPEED,
+                self.params.START_POSITION,
+                self.params.TURN_RATE
+            )
+            for _ in range(self.params.NUM_AGENTS)
+        ]       
         self.generation_count = 0
         self.is_running = True
         self.run_generation()
+    
+    def create_agent(self, agent_type) -> GeneticAgent:
+        pass

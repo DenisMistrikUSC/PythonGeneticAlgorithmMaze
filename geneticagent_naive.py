@@ -1,5 +1,6 @@
 import random
 import numpy as np
+from geneticagent_virtual import GeneticAgent
 # define an agent, fitness, mutation, crossover, etc.
 # movement will be based on a game loop system, genes will be vectors of direction, difference in direction will require longer turns
 # direction can change at most each 0.5 second (adjustable turn rate) turning will require time, 
@@ -15,7 +16,7 @@ import numpy as np
 #speed of agent
 #
 
-class GeneticAgent:
+class GeneticAgentNaive(GeneticAgent):
     def __init__(self, sequence_length, speed, start, turn_rate):
         self.sequence_length = sequence_length
         self.genes = np.random.uniform(-1.0, 1.0, (sequence_length, 2))
@@ -46,13 +47,13 @@ class GeneticAgent:
         return fitness
     
     def copy(self, generation) -> object:
-        clone = GeneticAgent(self.sequence_length, self.speed, self.start_position, self.turn_rate)
+        clone = GeneticAgentNaive(self.sequence_length, self.speed, self.start_position, self.turn_rate)
         clone.genes = self.genes[:]
         clone.generation = generation
         return clone
     
     def crossover(self, parent1, parent2, generation) -> object:
-        child = GeneticAgent(self.sequence_length, self.speed, self.start_position, self.turn_rate)
+        child = GeneticAgentNaive(self.sequence_length, self.speed, self.start_position, self.turn_rate)
         for i in range(self.sequence_length):
             if random.random() < 0.5:
                 child.genes[i] = parent1.genes[i]

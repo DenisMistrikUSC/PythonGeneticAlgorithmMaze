@@ -2,12 +2,12 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import geneticagent as ga
+from geneticagent_virtual import GeneticAgent 
 from scipy.stats import gaussian_kde
 
 class DataAnalyzer:
     def __init__(self, agent_list):
-        self.agent_list : list [ga.GeneticAgent] = agent_list
+        self.agent_list : list [GeneticAgent] = agent_list
 
     #show a 2d histogram like graph of where the final positions of each agent are
     def show_bottleneck_graph(self, height, width, bins):
