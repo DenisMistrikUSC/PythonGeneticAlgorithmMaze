@@ -56,6 +56,13 @@ class GeneticGUI:
         self.sequence_length_entry.insert(0, "40")
         self.sequence_length_entry.grid(row=row, column=1)
         row += 1
+
+        #Dropdown for agent types
+        options = ["naive" , "advanced"]
+        self.selected_agent_option = tk.StringVar(value=options[0])
+        tk.Label(window, text="Agent Type:").grid(row=row, column=0, sticky="e")
+        dropdown = tk.OptionMenu(window, self.selected_agent_option, *options).grid(row=row, column=1, sticky="we")
+        row += 1
         tk.Button(window, text="Start", command=self.start_button).grid(row=row, column=0, columnspan=2)
         row += 1
         self.gen_label = tk.Label(window, text="Generation: 0")
@@ -91,7 +98,7 @@ class GeneticGUI:
             OBSTACLES=WALLS
         )
         self.simulation = ga.GeneticSimulator(parameters=parameters,canvas=self.canvas, master=window, label_update=self.update_label, popup=self.open_graph_popup)      
-        self.simulation.start_simulation("naive")
+        self.simulation.start_simulation(self.selected_agent_option.get())
     def update_label(self, gen_count):
         self.gen_label.config(text=f"Generation: {gen_count}")
     def open_graph_popup(self):

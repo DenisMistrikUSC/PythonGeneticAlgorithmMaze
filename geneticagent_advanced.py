@@ -15,3 +15,25 @@ And it shoots out a singular line cast forward and that linecast returns a dista
 the second element of the tuple [0.8,0.8], otherwise maintain its original course
 Both the sequence of distances and the direction vector will be seeded randomly and mutated accordingly 
 '''
+import random
+import numpy as np
+from geneticagent_virtual import GeneticAgent
+
+class GeneticAgentAdvanced(GeneticAgent):
+    def __init__(self, sequence_length, speed, start, turn_rate):
+        pass
+
+    def mutate(self,rate) -> None:
+        pass
+
+    def get_fitness(self, goal) -> float:
+        pass
+
+    def copy(self, generation) -> object:
+        pass
+
+    def crossover(self, parent1, parent2, generation) -> object:
+        pass
+
+    def move(self, delta_time) -> tuple:
+        pass

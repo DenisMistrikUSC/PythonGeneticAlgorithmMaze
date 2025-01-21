@@ -12,6 +12,7 @@ import datanalysis
 from dataclasses import dataclass, field
 from agent_factory import AgentFactory
 from geneticagent_virtual import GeneticAgent
+
 @dataclass
 class GeneticAlgoParameters:
     GENETIC_SEQUENCE_LENGTH : int = 200
