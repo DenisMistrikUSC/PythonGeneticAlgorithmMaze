@@ -37,3 +37,8 @@ class GeneticAgentAdvanced(GeneticAgent):
 
     def move(self, delta_time) -> tuple:
         pass
+
+
+#for generating the initial sequence
+def generate_initial_sequence(self) -> tuple(list):
+    pass
