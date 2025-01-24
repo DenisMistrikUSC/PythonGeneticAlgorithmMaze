@@ -18,10 +18,29 @@ Both the sequence of distances and the direction vector will be seeded randomly 
 import random
 import numpy as np
 from geneticagent_virtual import GeneticAgent
-
+import linecast
 class GeneticAgentAdvanced(GeneticAgent):
-    def __init__(self, sequence_length, speed, start, turn_rate):
-        pass
+    def __init__(self, sequence_length, speed, start, turn_rate, obstacles, linecast_length=25.0, linecast_count=8):
+        self.sequence_length = sequence_length
+        self.speed = speed
+        self.linecast_vectors = []
+        angles = np.linspace(0, 2*np.pi, linecast_count, endpoint=False)
+        self.linecast_vectors = np.array(np.cos(angles), np.sin(angles)).T
+        self.path = [] #total path taken per frame,
+        self.final_position = np.array([0,0]) #this is either where it collides
+        self.curr_iteration = 0 #index of the genetic direction currently being used
+        self.position = np.array([start[0], start[1]])
+        self.start_position = np.array([start[0], start[1]])
+        self.curr_direction = self.genes[0]
+        self.turn_rate = turn_rate
+        self.iteration_delta_time = 0 #the amount of time that has passed since the current iteration started
+        self.has_collided = False #stop moving agents that hit a wall already
+        self.generation = 1 #current generation it is running in
+        self.inception_generation = 1 #generation where this agent was created 
+        self.genes = (np.random.uniform(-linecast_length,linecast_length, 
+                                        (sequence_length, len(self.linecast_vectors))),np.random.uniform(-1.0, 1.0, (sequence_length, 2)))
+        self.fitness = 0
+        self.obstacles = obstacles
 
     def mutate(self,rate) -> None:
         pass
@@ -37,8 +56,12 @@ class GeneticAgentAdvanced(GeneticAgent):
 
     def move(self, delta_time) -> tuple:
         pass
+    
+    #shoot all of your linecasts and return the nearest collision values of each in order
+    @staticmethod
+    def _shoot_linecasts(linecast_vectors, position, obstacles) -> np.ndarray:
+        distances = np.zeros(len(linecast_vectors))
+        for i in range(len(linecast_vectors)):
+            distances[i] = linecast.cast_line(position, linecast_vectors[i], obstacles)
 
-
-#for generating the initial sequence
-def generate_initial_sequence(self) -> tuple(list):
-    pass
+        return distances

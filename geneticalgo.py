@@ -26,8 +26,9 @@ class GeneticAlgoParameters:
     STRAGGLER_COUNT : int = 0
     START_POSITION : np.ndarray = field(default_factory=lambda:np.array([25.0,25.0]))
     GOAL_POSITION : np.ndarray = field(default_factory=lambda:np.array([400.0,400.0]))
-    OBSTACLES: list = field(default_factory=lambda:[]) 
-    #list because this can change with user input later down the line.
+    OBSTACLES: list = field(default_factory=lambda:[]) #list because this can change with user input later down the line.
+    
+
 
 class GeneticSimulator:
     def __init__(self, parameters : GeneticAlgoParameters, canvas : tk.Canvas, master : tk.Tk, label_update : callable, popup : callable):
