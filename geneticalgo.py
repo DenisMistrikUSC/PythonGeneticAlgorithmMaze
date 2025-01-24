@@ -27,7 +27,7 @@ class GeneticAlgoParameters:
     START_POSITION : np.ndarray = field(default_factory=lambda:np.array([25.0,25.0]))
     GOAL_POSITION : np.ndarray = field(default_factory=lambda:np.array([400.0,400.0]))
     OBSTACLES: list = field(default_factory=lambda:[]) #list because this can change with user input later down the line.
-    
+
 
 
 class GeneticSimulator:
@@ -43,24 +43,11 @@ class GeneticSimulator:
         self.label_update = label_update
         self.all_agents = [] # a list of all agents ever
         self.popup = popup
-        self.factory = AgentFactory()
         
 
     def collision_check(self, agent : GeneticAgent) -> None:
-        #check for collisions, if any found then set has_collided and final position 
-        #check maze bounds collision
-        has_collided = not np.all((self.params.MAZE_BOUNDS[0] < agent.position) & (agent.position < self.params.MAZE_BOUNDS[1]))
-        #check obstacle collision
-        #principles of AABB collision
-        if not has_collided:
-            for obstacle in self.params.OBSTACLES:
-                top_left = obstacle[0]
-                bottom_right = obstacle[1]
-                if np.all((top_left <= agent.position) & (agent.position <= bottom_right)):
-                    has_collided = True
-                    break
-        
-        if has_collided:
+        agent.collision_check()
+        if agent.has_collided:
             agent.has_collided = True
             agent.final_position = np.minimum(np.maximum(agent.position, self.params.MAZE_BOUNDS[0]), self.params.MAZE_BOUNDS[1])
             self.agents_finished += 1
@@ -157,12 +144,13 @@ class GeneticSimulator:
 
     def start_simulation(self, agent_type) -> None:
         self.population = [
-            self.factory.create_agent(
+            AgentFactory.create_agent(
                 agent_type,
                 self.params.GENETIC_SEQUENCE_LENGTH,
                 self.params.AGENT_SPEED,
                 self.params.START_POSITION,
-                self.params.TURN_RATE
+                self.params.TURN_RATE,
+                self.params.OBSTACLES
             )
             for _ in range(self.params.NUM_AGENTS)
         ]       

@@ -17,7 +17,7 @@ from geneticagent_virtual import GeneticAgent
 #
 
 class GeneticAgentNaive(GeneticAgent):
-    def __init__(self, sequence_length, speed, start, turn_rate):
+    def __init__(self, sequence_length, speed, start, turn_rate, obstacles):
         self.sequence_length = sequence_length
         self.genes = np.random.uniform(-1.0, 1.0, (sequence_length, 2))
         self.speed = speed
@@ -33,6 +33,7 @@ class GeneticAgentNaive(GeneticAgent):
         self.generation = 1 #current generation it is running in
         self.inception_generation = 1 #generation where this agent was created 
         self.fitness = 0
+        self.obstacles = obstacles
 
     def mutate(self,rate) -> None:
         for i in range(self.sequence_length):
@@ -47,13 +48,13 @@ class GeneticAgentNaive(GeneticAgent):
         return fitness
     
     def copy(self, generation) -> object:
-        clone = GeneticAgentNaive(self.sequence_length, self.speed, self.start_position, self.turn_rate)
+        clone = GeneticAgentNaive(self.sequence_length, self.speed, self.start_position, self.turn_rate, self.obstacles)
         clone.genes = self.genes[:]
         clone.generation = generation
         return clone
     
     def crossover(self, parent1, parent2, generation) -> object:
-        child = GeneticAgentNaive(self.sequence_length, self.speed, self.start_position, self.turn_rate)
+        child = GeneticAgentNaive(self.sequence_length, self.speed, self.start_position, self.turn_rate, self.obstacles)
         for i in range(self.sequence_length):
             if random.random() < 0.5:
                 child.genes[i] = parent1.genes[i]
@@ -82,4 +83,16 @@ class GeneticAgentNaive(GeneticAgent):
         self.path.append(self.position.copy())
        #
         return (old_position, self.position)
+
+    def collision_check(self) -> None:
+        #check for collisions, if any found then set has_collided and final position 
+        #check obstacle collision
+        #principles of AABB collision
+        if not self.has_collided:
+            for obstacle in self.obstacles:
+                top_left = obstacle[0]
+                bottom_right = obstacle[1]
+                if np.all((top_left <= self.position) & (self.position <= bottom_right)):
+                    self.has_collided = True
+                    break
 

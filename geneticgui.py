@@ -10,8 +10,13 @@ MAZE_HEIGHT = 500.0
 GOAL = np.array([450.0, 450.0])
 START = np.array([50.0, 50.0])
 WALLS = [
+    np.array([np.array([-50.0, 0.0]), np.array([0.0, MAZE_HEIGHT])]), #left wall of the maze
+    np.array([np.array([0.0, -50.0]), np.array([MAZE_WIDTH, 0.0])]), #top wall of the maze
+    np.array([np.array([MAZE_WIDTH, 0.0]), np.array([MAZE_WIDTH + 50.0, MAZE_HEIGHT])]), #right wall of the maze
+    np.array([np.array([0.0, MAZE_HEIGHT]), np.array([MAZE_WIDTH, MAZE_HEIGHT + 50.0])]), #bottom wall of the maze
     np.array([np.array([100.0,100.0]), np.array([300.0,300.0])])
 ]
+
 
 MAX_GENES = 200         
 class GeneticGUI:

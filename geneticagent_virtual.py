@@ -25,3 +25,8 @@ class GeneticAgent(ABC):
     @abstractmethod
     def move(self, delta_time) -> tuple:
         pass
+
+    #handle collision internally
+    @abstractmethod
+    def collision_check(self) -> None:
+        pass
