@@ -46,7 +46,11 @@ class GeneticAgentAdvanced(GeneticAgent):
         pass
 
     def get_fitness(self, goal) -> float:
-        pass
+        dx = goal[0] - self.position[0]
+        dy = goal[1] - self.position[1]
+        fitness = 1 / (dx ** 2 + dy ** 2 + 1)
+        self.fitness = fitness
+        return fitness
 
     def copy(self, generation) -> object:
         pass
@@ -56,7 +60,7 @@ class GeneticAgentAdvanced(GeneticAgent):
 
     def move(self, delta_time) -> tuple:
         pass
-    
+
     #shoot all of your linecasts and return the nearest collision values of each in order
     @staticmethod
     def _shoot_linecasts(linecast_vectors, position, obstacles) -> np.ndarray:
